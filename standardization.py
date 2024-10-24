@@ -52,6 +52,8 @@ num_pattern = r'\d'  # Matches strings that contain numbers
 anon_pattern = r'anon|anonymous|unnamed|unknown|unidentified|name withheld|witheld|nobody|no name|noname|unattributed'
 student_pattern = r'student' # Matches "student", "students", or "student of"
 
+# TODO: filter for other languages: French, Portuguese, Spanish, Chinese Kanji, Russian
+
 # Combine organization keywords into one big regex pattern
 organization_keys = [
     "group", "plants", "garden", "working", "university", "ubc", "college", 
@@ -82,6 +84,7 @@ data_filtered = data >> sift(
 )
 
 # Additional filtering for multiple names, remove these from dataframe
+# TODO: use stop words package - https://www.geeksforgeeks.org/removing-stop-words-nltk-python/
 data_multiple = data_filtered >> sift(X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
 data_filtered = data_filtered >> sift(~X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
 
@@ -95,6 +98,7 @@ from classifier import *
 # Apply the function to the combined column and create a boolean mask
 # Extract data that matches any of standard names
 # Create a dispatch table mapping standard names to their respective classification functions
+# TODO: test matching functions prior to deployment
 dispatch = {
     "Frank Lomer": match_frank_lomer,
     "Vladimir J. Krajina": match_vladimir_krajina,
@@ -168,6 +172,8 @@ for index, row in data_filtered.iterrows():
 
 # Convert the mismatched entries into a DataFrame
 mismatched_data = pd.DataFrame(mismatched_entries)
+
+# TODO: output matches to excel sheet
 
 # Get all instances of Jim J. Pojar using match function
 # Filter for all instances of 'Jim J. Pojar' using a filter or match function
