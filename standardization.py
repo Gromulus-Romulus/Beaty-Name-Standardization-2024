@@ -63,7 +63,7 @@ organization_keys = [
     "research", "laboratory", "faculty", "media", "journal", 
     "network", "station", "technology", "systems", "solutions", "software", "hardware", 
     "digital", "finance", "investment", "capital", "fund", "insurance", 
-    "legal", "firm", "attorneys", "judicial", "transit", 
+    "legal", "firm", "attorneys", "judicial", "transit", "communication",
     "shipping", "logistics", "assurance", "maritime",
     "market", "boutique", "commerce", "trading", "members", "oregon", "washington", "california"
 ]
