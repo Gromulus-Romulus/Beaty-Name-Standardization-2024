@@ -52,8 +52,6 @@ num_pattern = r'\d'  # Matches strings that contain numbers
 anon_pattern = r'anon|anonymous|unnamed|unknown|unidentified|name withheld|witheld|nobody|no name|noname|unattributed'
 student_pattern = r'student' # Matches "student", "students", or "student of"
 
-# TODO: filter for other languages: French, Portuguese, Spanish, Chinese Kanji, Russian
-
 # Combine organization keywords into one big regex pattern
 organization_keys = [
     "group", "plants", "garden", "working", "university", "ubc", "college", 
@@ -65,7 +63,7 @@ organization_keys = [
     "research", "laboratory", "faculty", "media", "journal", 
     "network", "station", "technology", "systems", "solutions", "software", "hardware", 
     "digital", "finance", "investment", "capital", "fund", "insurance", 
-    "legal", "firm", "attorneys", "judicial", "transit", "communication",
+    "legal", "firm", "attorneys", "judicial", "transit", 
     "shipping", "logistics", "assurance", "maritime",
     "market", "boutique", "commerce", "trading", "members", "oregon", "washington", "california"
 ]
@@ -84,7 +82,6 @@ data_filtered = data >> sift(
 )
 
 # Additional filtering for multiple names, remove these from dataframe
-# TODO: use stop words package - https://www.geeksforgeeks.org/removing-stop-words-nltk-python/
 data_multiple = data_filtered >> sift(X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
 data_filtered = data_filtered >> sift(~X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
 
@@ -98,7 +95,6 @@ from classifier import *
 # Apply the function to the combined column and create a boolean mask
 # Extract data that matches any of standard names
 # Create a dispatch table mapping standard names to their respective classification functions
-# TODO: test matching functions prior to deployment
 dispatch = {
     "Frank Lomer": match_frank_lomer,
     "Vladimir J. Krajina": match_vladimir_krajina,
@@ -162,7 +158,7 @@ for index, row in data_filtered.iterrows():
         continue
     
     # Check if the combined name does not match the standard name
-    if not compare_names(combined_name, standard_name, threshold=0.25):
+    if not compare_names(combined_name, standard_name, threshold=0.75):
         mismatched_entries.append({
             'GUID': row['GUID'],
             'combined': combined_name,
@@ -173,11 +169,12 @@ for index, row in data_filtered.iterrows():
 # Convert the mismatched entries into a DataFrame
 mismatched_data = pd.DataFrame(mismatched_entries)
 
-# TODO: output matches to excel sheet
-
 # Get all instances of Jim J. Pojar using match function
 # Filter for all instances of 'Jim J. Pojar' using a filter or match function
 # Get the matching function for 'Jim J. Pojar' from the dispatch table
-#matching = dispatch['Jim J. Pojar']
 
-#jim_j_pojar = data_filtered >> sift(data_filtered['combined'].apply(matching))
+jim_j_pojar = data_filtered >> sift(X['standard'] == 'Jim J. Pojar') 
+le_taylor = data_filtered >> sift(X['standard'] == 'L.E. Taylor') 
+john_davidson = data_filtered >> sift(X['standard'] == 'John Davidson')
+john_pinder_moss = data_filtered >> sift(X['standard'] == 'John Pinder-Moss')
+linda_jennings = data_filtered >> sift(X['standard'] == 'Linda Jennings')

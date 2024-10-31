@@ -126,12 +126,12 @@ def match_oluna_ceska(s: str) -> bool:
     pattern = r'\b(oluna)\s*(ceska)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
-def match_le_taylor(s: str) -> bool:
-    pattern = r'\b(l\.?e\.?)?\s*(taylor)\b'
+def match_le_taylor(s: str) -> bool: # updated 2024.10.24
+    pattern = r'\b[l|e][l\.\s]*[e\.]*\s*ta[y|i]lorr*\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
-def match_john_pinder_moss(s: str) -> bool:
-    pattern = r'\b(john)\s*(pinder-moss)\b'
+def match_john_pinder_moss(s: str) -> bool: # updated 2024.10.31
+    pattern = r'\b(j|j.|john)?\s*(pinder)(-)?(moss)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_wilfred_schofield(s: str) -> bool:
@@ -151,7 +151,7 @@ def match_eli_wilson(s: str) -> bool:
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_linda_jennings(s: str) -> bool:
-    pattern = r'\b(linda)\s*(jenning(s)?|lipsen)\b'
+    pattern = r'\b(l.|linda)\s*([p|.])*\s*(jenning(s)?|lipsen)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_quentin_cronk(s: str) -> bool:
