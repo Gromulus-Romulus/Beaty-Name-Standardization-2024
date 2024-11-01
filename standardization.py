@@ -15,9 +15,7 @@ Chat-GPT4 log:
 import pandas as pd
 import regex as re
 import dplython as dplyr
-from dplython import (DplyFrame, X, sift)
-
-# ... (previous code for loading and preparing data)
+from dplython import (DplyFrame, X, sift, mutate)
 
 from parsing import tokenize, standardize, compare_names
 
@@ -45,64 +43,58 @@ data = data >> dplyr.mutate(first=X['first'].replace('NaN', pd.NA),
 # Create 'Combined Name' by concatenating first, middle, and last names
 data['combined'] = data[['first', 'middle', 'last']].fillna('').agg(' '.join, axis=1).str.strip()
 
-# Define patterns for filtering out exceptional cases
+# Define patterns for filtering and categorizing cases
 nan_pattern = r'^\s*$'  # Matches empty strings
-length_pattern = r'^[^ ]{1,3}$'  # Matches 1 to 3 characters long strings
+length_pattern = r'^[^ ]{1,5}$'  # Matches 1 to 5 characters long strings
 num_pattern = r'\d'  # Matches strings that contain numbers
 anon_pattern = r'anon|anonymous|unnamed|unknown|unidentified|name withheld|witheld|nobody|no name|noname|unattributed'
-student_pattern = r'student' # Matches "student", "students", or "student of"
+student_pattern = r'student'  # Matches "student", "students", or "student of"
 
-# Combine organization keywords into one big regex pattern
+# Combine organization keywords into one regex pattern
 organization_keys = [
-    # Education and Research
     "academy", "college", "class", "department", "faculty", "institute", "laboratory", "media",
     "network", "research", "school", "station", "students", "university", "ubc",
-    
-    # Government and Public Agencies
     "agency", "council", "federal", "judicial", "ministry", "municipal", "office", 
-    "provincial", "state", 
-    
-    # Health and Medical
-    "clinic", "health", "hospital", "medical", "pharmacy",
-    
-    # Legal and Financial
+    "provincial", "state", "clinic", "health", "hospital", "medical", "pharmacy",
     "attorneys", "capital", "finance", "fund", "insurance", "investment", "legal", 
-    
-    # Technology and Digital
     "center", "digital", "hardware", "software", "solutions", "systems", "technology", 
-    
-    # Environmental and Conservation
     "alliance", "association", "biology", "coalition", "conservancy", "environmental", 
     "foundation", "garden", "group", "nature", "plants", "society", "wildlife", "working",
-    
-    # Business and Commerce
     "boutique", "commerce", "company", "firm", "holdings", "incorporated", "logistics",
-    "market", "members", "organization", "trading",
-    
-    # Logistics and Transport
-    "assurance", "maritime", "shipping", "transit",
-    
-    # Regional Locations
+    "market", "members", "organization", "trading", "assurance", "maritime", "shipping", "transit",
     "california", "oregon", "washington"
 ]
-
 organization_pattern = '|'.join(organization_keys)
 
-# Filter out unwanted rows (weird and special cases)
-data_filtered = data >> sift(
-    ~(X['first'].str.match(nan_pattern, na=False) & 
-     X['middle'].str.match(nan_pattern, na=False) & 
-     X['last'].str.match(nan_pattern, na=False)) & 
-    ~X['combined'].str.match(length_pattern, na=False) &
-    ~X['combined'].str.contains(num_pattern, na=False) &
-    ~X['combined'].str.contains(anon_pattern, na=False, flags=re.IGNORECASE) &
-    ~X['combined'].str.contains(student_pattern, na=False, flags=re.IGNORECASE) &
-    ~X['combined'].str.contains(organization_pattern, na=False, flags=re.IGNORECASE)
+# Fill 'standard' column based on conditions
+# Define the conditions for each category
+conditions = [
+    (data['first'].str.match(nan_pattern, na=False) & 
+     data['middle'].str.match(nan_pattern, na=False) & 
+     data['last'].str.match(nan_pattern, na=False)) | 
+    data['combined'].str.contains(anon_pattern, na=False, flags=re.IGNORECASE),
+    data['combined'].str.contains(organization_pattern, na=False, flags=re.IGNORECASE),
+    data['combined'].str.contains(student_pattern, na=False, flags=re.IGNORECASE),
+    data['combined'].str.contains(num_pattern, na=False),
+    data['combined'].str.match(length_pattern, na=False)
+]
+
+# Define the corresponding values for each category
+choices = [
+    "Anonymous",
+    "Organization",
+    "Student",
+    "Contains Number",
+    "Short Name"
+]
+
+# Apply np.select to create 'standard' column based on conditions
+data = data >> mutate(
+    standard=np.select(conditions, choices, default="Valid")
 )
 
-# Additional filtering for multiple names, remove these from dataframe
-data_multiple = data_filtered >> sift(X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
-data_filtered = data_filtered >> sift(~X['combined'].str.contains(r'\band\b|\bor\b|\band/or\b|,', na=False))
+
+# The resulting dataframe `data` now contains a 'standard' column with categorized entries.
 
 # - - - - - - - - - - -
 # If we have a list of standard names and known exceptions... we can just build separate
@@ -111,7 +103,7 @@ data_filtered = data_filtered >> sift(~X['combined'].str.contains(r'\band\b|\bor
 # Assuming we have a list of names formatted as [first] [initial] [last]
 # Let's strip unneccesary whitespaces by splitting words and recombining
 # This will help us match names more accurately
-data_filtered['combined_tokens'] = data_filtered['combined'].apply(lambda x: ' '.join(tokenize(x)))
+data['combined_tokens'] = data['combined'].apply(lambda x: ' '.join(tokenize(x)))
 
 from classifier import *
 
@@ -154,7 +146,15 @@ dispatch = {
     "D.B.O. Savile": match_db_o_savile,
     "Eli Wilson": match_eli_wilson,
     "Linda Jennings": match_linda_jennings,
-    "Quentin Cronk": match_quentin_cronk
+    "Quentin Cronk": match_quentin_cronk,
+    # TODO: input new names
+    "William Randolph Taylor" : match_william_randolph_taylor,
+    "F.J.R. Taylor" : match_fj_r_taylor,
+    "Sandra C. Lindstrom" : match_sandra_c_lindstrom,
+    "Stephen S. Talbot" : match_stephen_s_talbot,
+    "J.C. Oliveira" : match_jc_oliveira,
+    "J.L. Celistino" : match_jl_celistino,
+    "Stephen J. Oliver" : match_stephen_j_oliver,
 }
 
 # Function to classify names and return the standard name if matched
@@ -165,16 +165,74 @@ def classify_name(row):
         if match_function(name):
             return standard_name
             
-    return None  # Return None if no match found
+    return row['standard']  # Return default if no match found
 
 # Apply the classify_name function to each row
-data_filtered['standard'] = data_filtered.apply(classify_name, axis=1)
+data['standard'] = data.apply(classify_name, axis=1)
+
+# - - - - - - - - - - - - 
+# Test Cases
+frank_lomer = data >> sift(X['standard'] == 'Frank Lomer')
+vladimir_krajina = data >> sift(X['standard'] == 'Vladimir J. Krajina')
+thomas_taylor = data >> sift(X['standard'] == 'Thomas M.C. Taylor')
+john_eastham = data >> sift(X['standard'] == 'John W. Eastham')
+katherine_beamish = data >> sift(X['standard'] == 'Katherine I. Beamish')
+gerald_straley = data >> sift(X['standard'] == 'Gerald B. Straley')
+vernon_brink = data >> sift(X['standard'] == 'Vernon C. Brink')
+john_davidson = data >> sift(X['standard'] == 'John Davidson')
+adam_szczawinski = data >> sift(X['standard'] == 'Adam F. Szczawinski')
+james_calder = data >> sift(X['standard'] == 'James A. Calder')
+freek_vrugtman = data >> sift(X['standard'] == 'Freek Vrugtman')
+william_mccalla = data >> sift(X['standard'] == 'William Copeland McCalla')
+jim_pojar = data >> sift(X['standard'] == 'Jim J. Pojar')
+roy_taylor = data >> sift(X['standard'] == 'Roy L. Taylor')
+bruce_bennett = data >> sift(X['standard'] == 'Bruce A. Bennett')
+beryl_zhuang = data >> sift(X['standard'] == 'Beryl C. Zhuang')
+trevor_goward = data >> sift(X['standard'] == 'Trevor Goward')
+jeffery_saarela = data >> sift(X['standard'] == 'Jeffery M. Saarela')
+terry_mcintosh = data >> sift(X['standard'] == 'Terry T. McIntosh')
+william_cody = data >> sift(X['standard'] == 'William J. Cody')
+fred_fodor = data >> sift(X['standard'] == 'Fred Fodor')
+charles_beil = data >> sift(X['standard'] == 'Charles E. Beil')
+curtis_bjork = data >> sift(X['standard'] == 'Curtis R. Bjork')
+jamie_fenneman = data >> sift(X['standard'] == 'Jamie D. Fenneman')
+erin_manton = data >> sift(X['standard'] == 'Erin R. Manton')
+adolf_ceska = data >> sift(X['standard'] == 'Adolf Ceska')
+oluna_ceska = data >> sift(X['standard'] == 'Oluna Ceska')
+le_taylor = data >> sift(X['standard'] == 'L.E. Taylor')
+john_pinder_moss = data >> sift(X['standard'] == 'John Pinder-Moss')
+wilfred_schofield = data >> sift(X['standard'] == 'Wilfred Schofield')
+corinne_selby = data >> sift(X['standard'] == 'Corinne J. Selby')
+db_o_savile = data >> sift(X['standard'] == 'D.B.O. Savile')
+eli_wilson = data >> sift(X['standard'] == 'Eli Wilson')
+linda_jennings = data >> sift(X['standard'] == 'Linda Jennings')
+quentin_cronk = data >> sift(X['standard'] == 'Quentin Cronk')
+william_randolph_taylor = data >> sift(X['standard'] == 'William Randolph Taylor')
+fj_r_taylor = data >> sift(X['standard'] == 'F.J.R. Taylor')
+sandra_c_lindstrom = data >> sift(X['standard'] == 'Sandra C. Lindstrom')
+stephen_s_talbot = data >> sift(X['standard'] == 'Stephen S. Talbot')
+jc_oliveira = data >> sift(X['standard'] == 'J.C. Oliveira')
+jl_celestino = data >> sift(X['standard'] == 'J.L. Celistino')
+stephen_j_oliver = data >> sift(X['standard'] == 'Stephen J. Oliver')
+
+# Final to_standardize dataframe
+to_standardize = pd.concat([
+    frank_lomer, vladimir_krajina, thomas_taylor, john_eastham, katherine_beamish,
+    gerald_straley, vernon_brink, john_davidson, adam_szczawinski, james_calder,
+    freek_vrugtman, william_mccalla, jim_pojar, roy_taylor, bruce_bennett,
+    beryl_zhuang, trevor_goward, jeffery_saarela, terry_mcintosh, william_cody,
+    fred_fodor, charles_beil, curtis_bjork, jamie_fenneman, erin_manton,
+    adolf_ceska, oluna_ceska, le_taylor, john_pinder_moss, wilfred_schofield,
+    corinne_selby, db_o_savile, eli_wilson, linda_jennings, quentin_cronk,
+    william_randolph_taylor, fj_r_taylor, sandra_c_lindstrom, stephen_s_talbot,
+    jc_oliveira, jl_celestino, stephen_j_oliver
+])
 
 # List to store mismatched entries
 mismatched_entries = []
 
 # Iterate through the DataFrame to compare combined names with standard names
-for index, row in data_filtered.iterrows():
+for index, row in to_standardize.iterrows():
     combined_name = row['combined']
     standard_name = row['standard']
     
@@ -182,7 +240,7 @@ for index, row in data_filtered.iterrows():
         continue
     
     # Check if the combined name does not match the standard name
-    if not compare_names(combined_name, standard_name, threshold=0.75):
+    if not compare_names(combined_name, standard_name, threshold=0.5):
         mismatched_entries.append({
             'GUID': row['GUID'],
             'combined': combined_name,
@@ -193,56 +251,6 @@ for index, row in data_filtered.iterrows():
 # Convert the mismatched entries into a DataFrame
 mismatched_data = pd.DataFrame(mismatched_entries)
 
-# Get all instances of Jim J. Pojar using match function
-# Filter for all instances of 'Jim J. Pojar' using a filter or match function
-# Get the matching function for 'Jim J. Pojar' from the dispatch table
-frank_lomer = data_filtered >> sift(X['standard'] == 'Frank Lomer')
-vladimir_krajina = data_filtered >> sift(X['standard'] == 'Vladimir J. Krajina')
-thomas_taylor = data_filtered >> sift(X['standard'] == 'Thomas M.C. Taylor')
-john_eastham = data_filtered >> sift(X['standard'] == 'John W. Eastham')
-katherine_beamish = data_filtered >> sift(X['standard'] == 'Katherine I. Beamish')
-gerald_straley = data_filtered >> sift(X['standard'] == 'Gerald B. Straley')
-vernon_brink = data_filtered >> sift(X['standard'] == 'Vernon C. Brink')
-john_davidson = data_filtered >> sift(X['standard'] == 'John Davidson')
-adam_szczawinski = data_filtered >> sift(X['standard'] == 'Adam F. Szczawinski')
-james_calder = data_filtered >> sift(X['standard'] == 'James A. Calder')
-freek_vrugtman = data_filtered >> sift(X['standard'] == 'Freek Vrugtman')
-william_mccalla = data_filtered >> sift(X['standard'] == 'William Copeland McCalla')
-jim_pojar = data_filtered >> sift(X['standard'] == 'Jim J. Pojar')
-roy_taylor = data_filtered >> sift(X['standard'] == 'Roy L. Taylor')
-bruce_bennett = data_filtered >> sift(X['standard'] == 'Bruce A. Bennett')
-beryl_zhuang = data_filtered >> sift(X['standard'] == 'Beryl C. Zhuang')
-trevor_goward = data_filtered >> sift(X['standard'] == 'Trevor Goward')
-jeffery_saarela = data_filtered >> sift(X['standard'] == 'Jeffery M. Saarela')
-terry_mcintosh = data_filtered >> sift(X['standard'] == 'Terry T. McIntosh')
-william_cody = data_filtered >> sift(X['standard'] == 'William J. Cody')
-fred_fodor = data_filtered >> sift(X['standard'] == 'Fred Fodor')
-charles_beil = data_filtered >> sift(X['standard'] == 'Charles E. Beil')
-curtis_bjork = data_filtered >> sift(X['standard'] == 'Curtis R. Bjork')
-jamie_fenneman = data_filtered >> sift(X['standard'] == 'Jamie D. Fenneman')
-erin_manton = data_filtered >> sift(X['standard'] == 'Erin R. Manton')
-adolf_ceska = data_filtered >> sift(X['standard'] == 'Adolf Ceska')
-oluna_ceska = data_filtered >> sift(X['standard'] == 'Oluna Ceska')
-le_taylor = data_filtered >> sift(X['standard'] == 'L.E. Taylor')
-john_pinder_moss = data_filtered >> sift(X['standard'] == 'John Pinder-Moss')
-wilfred_schofield = data_filtered >> sift(X['standard'] == 'Wilfred Schofield')
-corinne_selby = data_filtered >> sift(X['standard'] == 'Corinne J. Selby')
-db_o_savile = data_filtered >> sift(X['standard'] == 'D.B.O. Savile')
-eli_wilson = data_filtered >> sift(X['standard'] == 'Eli Wilson')
-linda_jennings = data_filtered >> sift(X['standard'] == 'Linda Jennings')
-quentin_cronk = data_filtered >> sift(X['standard'] == 'Quentin Cronk')
-
-# Final to_standardize dataframe
-to_standardize = pd.concat([
-    frank_lomer, vladimir_krajina, thomas_taylor, john_eastham, katherine_beamish,
-    gerald_straley, vernon_brink, john_davidson, adam_szczawinski, james_calder,
-    freek_vrugtman, william_mccalla, jim_pojar, roy_taylor, bruce_bennett,
-    beryl_zhuang, trevor_goward, jeffery_saarela, terry_mcintosh, william_cody,
-    fred_fodor, charles_beil, curtis_bjork, jamie_fenneman, erin_manton,
-    adolf_ceska, oluna_ceska, le_taylor, john_pinder_moss, wilfred_schofield,
-    corinne_selby, db_o_savile, eli_wilson, linda_jennings, quentin_cronk
-])
-
 # select only relevant columns
 to_standardize = to_standardize[['GUID', 'first', 'middle', 'last', 'standard']]
 to_standardize = to_standardize.rename(columns={
@@ -252,4 +260,5 @@ to_standardize = to_standardize.rename(columns={
     'last': 'Last.Name', 
     'standard': 'Standardized Name'
 })
+
 to_standardize.to_excel("to_standardize.xlsx", index=False)
