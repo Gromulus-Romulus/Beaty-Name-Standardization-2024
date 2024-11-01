@@ -54,19 +54,38 @@ student_pattern = r'student' # Matches "student", "students", or "student of"
 
 # Combine organization keywords into one big regex pattern
 organization_keys = [
-    "group", "plants", "garden", "working", "university", "ubc", "college", 
-    "school", "class", "biology", "students", "department", "ministry", "federal", "provincial",
-    "state", "municipal", "council", "agency", "office",
-    "company", "incorporated", "holdings", "foundation", 
-    "association", "society", "alliance", "coalition", "charity", "hospital", 
-    "clinic", "health", "medical", "pharmacy", "academy", "institute", "center",
-    "research", "laboratory", "faculty", "media", "journal", 
-    "network", "station", "technology", "systems", "solutions", "software", "hardware", 
-    "digital", "finance", "investment", "capital", "fund", "insurance", 
-    "legal", "firm", "attorneys", "judicial", "transit", 
-    "shipping", "logistics", "assurance", "maritime",
-    "market", "boutique", "commerce", "trading", "members", "oregon", "washington", "california"
+    # Education and Research
+    "academy", "college", "class", "department", "faculty", "institute", "laboratory", "media",
+    "network", "research", "school", "station", "students", "university", "ubc",
+    
+    # Government and Public Agencies
+    "agency", "council", "federal", "judicial", "ministry", "municipal", "office", 
+    "provincial", "state", 
+    
+    # Health and Medical
+    "clinic", "health", "hospital", "medical", "pharmacy",
+    
+    # Legal and Financial
+    "attorneys", "capital", "finance", "fund", "insurance", "investment", "legal", 
+    
+    # Technology and Digital
+    "center", "digital", "hardware", "software", "solutions", "systems", "technology", 
+    
+    # Environmental and Conservation
+    "alliance", "association", "biology", "coalition", "conservancy", "environmental", 
+    "foundation", "garden", "group", "nature", "plants", "society", "wildlife", "working",
+    
+    # Business and Commerce
+    "boutique", "commerce", "company", "firm", "holdings", "incorporated", "logistics",
+    "market", "members", "organization", "trading",
+    
+    # Logistics and Transport
+    "assurance", "maritime", "shipping", "transit",
+    
+    # Regional Locations
+    "california", "oregon", "washington"
 ]
+
 organization_pattern = '|'.join(organization_keys)
 
 # Filter out unwanted rows (weird and special cases)
@@ -88,6 +107,11 @@ data_filtered = data_filtered >> sift(~X['combined'].str.contains(r'\band\b|\bor
 # - - - - - - - - - - -
 # If we have a list of standard names and known exceptions... we can just build separate
 # routines that go through the data and apply the standardization rules unique to each person.
+
+# Assuming we have a list of names formatted as [first] [initial] [last]
+# Let's strip unneccesary whitespaces by splitting words and recombining
+# This will help us match names more accurately
+data_filtered['combined_tokens'] = data_filtered['combined'].apply(lambda x: ' '.join(tokenize(x)))
 
 from classifier import *
 
@@ -135,7 +159,7 @@ dispatch = {
 
 # Function to classify names and return the standard name if matched
 def classify_name(row):
-    name = row['combined']
+    name = row['combined_tokens']
     
     for standard_name, match_function in dispatch.items():
         if match_function(name):
@@ -172,9 +196,60 @@ mismatched_data = pd.DataFrame(mismatched_entries)
 # Get all instances of Jim J. Pojar using match function
 # Filter for all instances of 'Jim J. Pojar' using a filter or match function
 # Get the matching function for 'Jim J. Pojar' from the dispatch table
-
-jim_j_pojar = data_filtered >> sift(X['standard'] == 'Jim J. Pojar') 
-le_taylor = data_filtered >> sift(X['standard'] == 'L.E. Taylor') 
+frank_lomer = data_filtered >> sift(X['standard'] == 'Frank Lomer')
+vladimir_krajina = data_filtered >> sift(X['standard'] == 'Vladimir J. Krajina')
+thomas_taylor = data_filtered >> sift(X['standard'] == 'Thomas M.C. Taylor')
+john_eastham = data_filtered >> sift(X['standard'] == 'John W. Eastham')
+katherine_beamish = data_filtered >> sift(X['standard'] == 'Katherine I. Beamish')
+gerald_straley = data_filtered >> sift(X['standard'] == 'Gerald B. Straley')
+vernon_brink = data_filtered >> sift(X['standard'] == 'Vernon C. Brink')
 john_davidson = data_filtered >> sift(X['standard'] == 'John Davidson')
+adam_szczawinski = data_filtered >> sift(X['standard'] == 'Adam F. Szczawinski')
+james_calder = data_filtered >> sift(X['standard'] == 'James A. Calder')
+freek_vrugtman = data_filtered >> sift(X['standard'] == 'Freek Vrugtman')
+william_mccalla = data_filtered >> sift(X['standard'] == 'William Copeland McCalla')
+jim_pojar = data_filtered >> sift(X['standard'] == 'Jim J. Pojar')
+roy_taylor = data_filtered >> sift(X['standard'] == 'Roy L. Taylor')
+bruce_bennett = data_filtered >> sift(X['standard'] == 'Bruce A. Bennett')
+beryl_zhuang = data_filtered >> sift(X['standard'] == 'Beryl C. Zhuang')
+trevor_goward = data_filtered >> sift(X['standard'] == 'Trevor Goward')
+jeffery_saarela = data_filtered >> sift(X['standard'] == 'Jeffery M. Saarela')
+terry_mcintosh = data_filtered >> sift(X['standard'] == 'Terry T. McIntosh')
+william_cody = data_filtered >> sift(X['standard'] == 'William J. Cody')
+fred_fodor = data_filtered >> sift(X['standard'] == 'Fred Fodor')
+charles_beil = data_filtered >> sift(X['standard'] == 'Charles E. Beil')
+curtis_bjork = data_filtered >> sift(X['standard'] == 'Curtis R. Bjork')
+jamie_fenneman = data_filtered >> sift(X['standard'] == 'Jamie D. Fenneman')
+erin_manton = data_filtered >> sift(X['standard'] == 'Erin R. Manton')
+adolf_ceska = data_filtered >> sift(X['standard'] == 'Adolf Ceska')
+oluna_ceska = data_filtered >> sift(X['standard'] == 'Oluna Ceska')
+le_taylor = data_filtered >> sift(X['standard'] == 'L.E. Taylor')
 john_pinder_moss = data_filtered >> sift(X['standard'] == 'John Pinder-Moss')
+wilfred_schofield = data_filtered >> sift(X['standard'] == 'Wilfred Schofield')
+corinne_selby = data_filtered >> sift(X['standard'] == 'Corinne J. Selby')
+db_o_savile = data_filtered >> sift(X['standard'] == 'D.B.O. Savile')
+eli_wilson = data_filtered >> sift(X['standard'] == 'Eli Wilson')
 linda_jennings = data_filtered >> sift(X['standard'] == 'Linda Jennings')
+quentin_cronk = data_filtered >> sift(X['standard'] == 'Quentin Cronk')
+
+# Final to_standardize dataframe
+to_standardize = pd.concat([
+    frank_lomer, vladimir_krajina, thomas_taylor, john_eastham, katherine_beamish,
+    gerald_straley, vernon_brink, john_davidson, adam_szczawinski, james_calder,
+    freek_vrugtman, william_mccalla, jim_pojar, roy_taylor, bruce_bennett,
+    beryl_zhuang, trevor_goward, jeffery_saarela, terry_mcintosh, william_cody,
+    fred_fodor, charles_beil, curtis_bjork, jamie_fenneman, erin_manton,
+    adolf_ceska, oluna_ceska, le_taylor, john_pinder_moss, wilfred_schofield,
+    corinne_selby, db_o_savile, eli_wilson, linda_jennings, quentin_cronk
+])
+
+# select only relevant columns
+to_standardize = to_standardize[['GUID', 'first', 'middle', 'last', 'standard']]
+to_standardize = to_standardize.rename(columns={
+    'GUID': 'GUID', 
+    'first': 'First.Name', 
+    'middle': 'Middle.Name', 
+    'last': 'Last.Name', 
+    'standard': 'Standardized Name'
+})
+to_standardize.to_excel("to_standardize.xlsx", index=False)

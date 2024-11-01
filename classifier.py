@@ -19,142 +19,141 @@ import regex as re
 # This is on my TODO list - Nate
  
 def match_frank_lomer(s: str) -> bool:
-    pattern = r'\b(frank)\s*(lomer)\b'
+    pattern = r'\b(f|fra[mn]k)\s*(w)?\s*(lom[ea]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_vladimir_krajina(s: str) -> bool:
-    pattern = r'\b(vladimir)\s*(j\.?\s*)?(krajina)\b'
+    pattern = r'\b(v|vlad[ia]*[mn][ei]r)\s*(j)?\s*(kraji[mn]a)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_thomas_taylor(s: str) -> bool:
-    pattern = r'\b(thomas)\s*(m\.?c\.?)?\s*(taylor)\b'
+    pattern = r'\b(t|t(h)?om[ai]s)\s*(m)?(c)?\s*(ta[iy]?l[oei]?r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_john_eastham(s: str) -> bool:
-    pattern = r'\b(john)\s*(w\.?)?\s*(eastham)\b'
+    pattern = r'\b(j|jo[ghn]?n)\s*(w)?\s*(e[a]?st[he]?a[mn])\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_katherine_beamish(s: str) -> bool:
-    pattern = r'\b(katherine)\s*(i\.?)?\s*(beamish)\b'
+    pattern = r'\b(k|[ck]atherin[e]?)\s*(i)?\s*([dbp]?e[ea]?mis[sh]*)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_gerald_straley(s: str) -> bool:
-    pattern = r'\b(gerald)\s*(b\.?)?\s*(straley)\b'
+    pattern = r'\b(g|gerald)\s*(b)?\s*(stra[y]?[il]+[e]?y)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_vernon_brink(s: str) -> bool:
-    pattern = r'\b(vernon)\s*(c\.?)?\s*(brink)\b'
+    pattern = r'\b(v|vernon)\s*(c)?\s*(brink)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_john_davidson(s: str) -> bool:
-    pattern = r'\b(john)\s*(davidson)\b'
+    pattern = r'\b(j|john|jo[n]+)\s*(dav[iy]dson)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_adam_szczawinski(s: str) -> bool:
-    pattern = r'\b(adam)\s*(f\.?)?\s*(szczawinski)\b'
+    pattern = r'\b(a|adam)\s*(f)?\s*(s[zc]*[aou]+[win]+[skiy]+)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_james_calder(s: str) -> bool:
-    pattern = r'\b(james)\s*(a\.?)?\s*(calder)\b'
+    pattern = r'\b(j|james)\s*(a)?\s*(cald[ei][ry])\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_freek_vrugtman(s: str) -> bool:
-    pattern = r'\b(freek)\s*(vrugtman)\b'
+    pattern = r'\b(f|fr[e]+k)\s*(v[r]+u[gt]+[a]?man)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_william_mccalla(s: str) -> bool:
-    pattern = r'\b(william)\s*(copeland)?\s*(mccalla)\b'
+    pattern = r'\b(w|william)\s*(copeland)?\s*(mccal+?[la])\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_jim_pojar(s: str) -> bool:
-    pattern = r'\b(j)?(j+\.?|jim|james)\s*(j?\.?)\s*pojar\b'
+    pattern = r'\b(j|jim|james)\s*(j)?\s*(pojar)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_roy_taylor(s: str) -> bool:
-    pattern = r'\b(roy)\s*(l\.?)?\s*(taylor)\b'
+    pattern = r'\b(r|roy)\s*(l)?\s*(tayl[oe]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_bruce_bennett(s: str) -> bool:
-    pattern = r'\b(bruce)\s*(a\.?)?\s*(bennett)\b'
+    pattern = r'\b(b|b[r]?uce)\s*(a)?\s*(be[n]+e[t]+)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_beryl_zhuang(s: str) -> bool:
-    pattern = r'\b(beryl)\s*(c\.?)?\s*(zhuang)\b'
+    pattern = r'\b(b|ber[yi]l)\s*(c)?\s*(z[h]?uang)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_trevor_goward(s: str) -> bool:
-    pattern = r'\b(trevor)\s*(goward)\b'
+    pattern = r'\b(t|trev[eo]r)\s*(goward)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_jeffery_saarela(s: str) -> bool:
-    pattern = r'\b(jeffery)\s*(m\.?)?\s*(saarela)\b'
+    pattern = r'\b(j|jeff([ae]ry|r[ea]y)?)\s*(m)?\s*(saarela)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_terry_mcintosh(s: str) -> bool:
-    pattern = r'\b(terry)\s*(t\.?)?\s*(mcintosh)\b'
+    pattern = r'\b(t|terry)\s*(t)?\s*(mcintosh)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_william_cody(s: str) -> bool:
-    pattern = r'\b(william)\s*(j\.?)?\s*(cody)\b'
+    pattern = r'\b(w|william)\s*(j)?\s*(cody)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_fred_fodor(s: str) -> bool:
-    pattern = r'\b(fred)\s*(fodor)\b'
+    pattern = r'\b(f|fred)\s*(fod[oi]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_charles_beil(s: str) -> bool:
-    pattern = r'\b(charles)\s*(e\.?)?\s*(beil)\b'
+    pattern = r'\b(c|c[h]?arles)\s*(e)?\s*(b[e]*il)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_curtis_bjork(s: str) -> bool:
-    pattern = r'\b(curtis)\s*(r\.?)?\s*(bjork)\b'
+    pattern = r'\b(c|k|[ck]urtis)\s*(r)?\s*(b[j]*ork)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_jamie_fenneman(s: str) -> bool:
-    pattern = r'\b(jamie)\s*(d\.?)?\s*(fenneman)\b'
+    pattern = r'\b(j|jamie|james)\s*(d)?\s*(fe[n]+ema[n]+)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_erin_manton(s: str) -> bool:
-    pattern = r'\b(erin)\s*(r\.?)?\s*(manton)\b'
+    pattern = r'\b(e|erin)\s*(r)?\s*(mant[oe]n)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_adolf_ceska(s: str) -> bool:
-    pattern = r'\b(adolf)\s*(ceska)\b'
+    pattern = r'\b(a|adolf)\s*(ceska)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_oluna_ceska(s: str) -> bool:
-    pattern = r'\b(oluna)\s*(ceska)\b'
+    pattern = r'\b(o|oluna)\s*(ceska)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
-def match_le_taylor(s: str) -> bool: # updated 2024.10.24
-    pattern = r'\b[l|e][l\.\s]*[e\.]*\s*ta[y|i]lorr*\b'
+def match_le_taylor(s: str) -> bool:
+    pattern = r'\b(l|le)\s*ta[y|i]l[o]?r\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
-def match_john_pinder_moss(s: str) -> bool: # updated 2024.10.31
-    pattern = r'\b(j|j.|john)?\s*(pinder)(-)?(moss)\b'
+def match_john_pinder_moss(s: str) -> bool:
+    pattern = r'\b(j|jo[hn]+)?\s*(pin[d]?er)(-)?(mo[s]+)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_wilfred_schofield(s: str) -> bool:
-    pattern = r'\b(wilfred)\s*(schofield)\b'
+    pattern = r'\b(w|wi[l]?fred)\s*(sc[h]?of[i]?eld)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_corinne_selby(s: str) -> bool:
-    pattern = r'\b(corinne)\s*(j\.?)?\s*(selby)\b'
+    pattern = r'\b(c|corinne)\s*(j)?\s*(se[lb]+y)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_db_o_savile(s: str) -> bool:
-    pattern = r'\b(d\.?b\.?o\.?)?\s*(savile)\b'
+    pattern = r'\b(d|dbo)?\s*[dbo]*\s*(sa[v]+[ei][l]+e)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_eli_wilson(s: str) -> bool:
-    pattern = r'\b(eli)\s*(wilson)\b'
+    pattern = r'\b(e|eli)\s*(wilson)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_linda_jennings(s: str) -> bool:
-    pattern = r'\b(l.|linda)\s*([p|.])*\s*(jenning(s)?|lipsen)\b'
+    pattern = r'\b(l|linda)\s*([p])?\s*(jenning(s)?|lips[oe]n)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_quentin_cronk(s: str) -> bool:
-    pattern = r'\b(q|quentin)\s*(cron(k|k)?|cronk)\b'
+    pattern = r'\b(q|quentin)\s*([ck]ro[nm][kc]?)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
-  
