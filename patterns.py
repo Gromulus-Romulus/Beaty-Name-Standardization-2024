@@ -185,4 +185,7 @@ def match_jl_celistino(s: str) -> bool:
 def match_stephen_j_oliver(s: str) -> bool:
     pattern = r'\b(s|ste[phfv]+[ea]n)\s*(j)?\s*(oliv[ei]+[r]+)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
-    
+  
+def match_student(s: str) -> bool:
+    pattern = r'\bstudent[s]?|graduate[s]?\b'
+    return bool(re.search(pattern, s.strip(), re.IGNORECASE))

@@ -13,11 +13,12 @@ Chat-GPT4 log:
 
 # Import necessary libraries
 import pandas as pd
+import numpy as np
 import regex as re
 import dplython as dplyr
 from dplython import (DplyFrame, X, sift, mutate)
 
-from parsing import tokenize, standardize, compare_names
+from compare_names import tokenize, standardize, compare_names
 
 # Helper function to open Excel files as DataFrames
 def open_excel(file, header=0):
@@ -48,7 +49,6 @@ nan_pattern = r'^\s*$'  # Matches empty strings
 length_pattern = r'^[^ ]{1,5}$'  # Matches 1 to 5 characters long strings
 num_pattern = r'\d'  # Matches strings that contain numbers
 anon_pattern = r'anon|anonymous|unnamed|unknown|unidentified|name withheld|witheld|nobody|no name|noname|unattributed'
-student_pattern = r'student'  # Matches "student", "students", or "student of"
 
 # Combine organization keywords into one regex pattern
 organization_keys = [
@@ -74,7 +74,6 @@ conditions = [
      data['last'].str.match(nan_pattern, na=False)) | 
     data['combined'].str.contains(anon_pattern, na=False, flags=re.IGNORECASE),
     data['combined'].str.contains(organization_pattern, na=False, flags=re.IGNORECASE),
-    data['combined'].str.contains(student_pattern, na=False, flags=re.IGNORECASE),
     data['combined'].str.contains(num_pattern, na=False),
     data['combined'].str.match(length_pattern, na=False)
 ]
@@ -83,16 +82,14 @@ conditions = [
 choices = [
     "Anonymous",
     "Organization",
-    "Student",
     "Contains Number",
     "Short Name"
 ]
 
 # Apply np.select to create 'standard' column based on conditions
 data = data >> mutate(
-    standard=np.select(conditions, choices, default="Valid")
+    standard=np.select(conditions, choices, default=pd.NA)
 )
-
 
 # The resulting dataframe `data` now contains a 'standard' column with categorized entries.
 
@@ -155,6 +152,8 @@ dispatch = {
     "J.C. Oliveira" : match_jc_oliveira,
     "J.L. Celistino" : match_jl_celistino,
     "Stephen J. Oliver" : match_stephen_j_oliver,
+    # For students of people
+    "Student" : match_student
 }
 
 # Function to classify names and return the standard name if matched
@@ -262,3 +261,60 @@ to_standardize = to_standardize.rename(columns={
 })
 
 to_standardize.to_excel("to_standardize.xlsx", index=False)
+
+# - - - - - - - - - - - -
+# Next approach is to count remaining uncategorized names by alphabetical order
+# This will help in identifying patterns and exceptions
+
+# Ignore first, middle, last fields for now
+# data_uncategorized = data >> \
+#     sift(X['standard'].isna()) >> \
+#     dplyr.select(X.GUID, X.combined, X.combined_tokens, X.standard)
+#     
+# # Assuming `tokenize` is a function that splits the name string into tokens
+# # Extract last name with a check for empty tokens
+# data_uncategorized['lastname'] = [
+#     tokenize(name)[-1] if tokenize(name) else None for name in data_uncategorized['combined_tokens']
+# ]
+# 
+# data_uncategorized['firstname'] = [
+#     tokenize(name)[0] if tokenize(name) else None for name in data_uncategorized['combined_tokens']
+# ]
+
+# import matplotlib.pyplot as plt
+# 
+# # Group by the last name and count occurrences
+# count_by_lastname = data_uncategorized.groupby('lastname').size().reset_index(name='count')
+# 
+# # Create a new column to group names with occurrences of 1 or 2 under "Other"
+# count_by_lastname['lastname_grouped'] = count_by_lastname['lastname'].where(count_by_lastname['count'] > 5, 'Other')
+# 
+# # Re-aggregate the counts based on the new grouped names
+# count_by_lastname_grouped = count_by_lastname.groupby('lastname_grouped')['count'].sum().reset_index()
+# 
+# # Plot a pie chart
+# import matplotlib.pyplot as plt
+# 
+# plt.figure(figsize=(8, 8))
+# plt.pie(count_by_lastname_grouped['count'], labels=count_by_lastname_grouped['lastname_grouped'], autopct='%1.1f%%', startangle=140)
+# plt.title("Distribution of Entries by Last Name (Grouped)")
+# plt.show()
+# 
+# # Group by the first name and count occurrences
+# count_by_firstname = data_uncategorized.groupby('firstname').size().reset_index(name='count')
+# 
+# # Create a new column to group names with occurrences of 1 or 2 under "Other"
+# count_by_firstname['firstname_grouped'] = count_by_firstname['firstname'].where(count_by_firstname['count'] > 20, 'Other')
+# 
+# # Re-aggregate the counts based on the new grouped names
+# count_by_firstname_grouped = count_by_firstname.groupby('firstname_grouped')['count'].sum().reset_index()
+# 
+# # Count by first name
+# import matplotlib.pyplot as plt
+# 
+# plt.figure(figsize=(8, 8))
+# plt.pie(count_by_firstname_grouped['count'], labels=count_by_firstname_grouped['firstname_grouped'], autopct='%1.1f%%', startangle=140)
+# plt.title("Distribution of Entries by First Name (Grouped)")
+# plt.show()
+
+
