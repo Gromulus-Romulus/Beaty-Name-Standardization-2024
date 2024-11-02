@@ -23,6 +23,12 @@ from compare_names import tokenize, standardize, compare_names
 # Helper function to open Excel files as DataFrames
 def open_excel(file, header=0):
     return DplyFrame(pd.read_excel(file, header=header))
+  
+# Tokenize names: clean, split, and remove stop words (and suffixes)
+def tokenize(name):
+    clean_name = name.lower().strip()
+    tokens = re.split(r'[\s.?,{\[\(]+', clean_name) 
+    return [t for t in tokens if t not in ['and', 'or', 'is', 'for', '', 'mr', 'mrs', 'dr', 'drs', 'jr']]
 
 # Open agents dataframe and organizations
 data = open_excel('./Names/Agents Download - Wed Oct 16 2024.xlsx')
