@@ -55,6 +55,7 @@ nan_pattern = r'^\s*$'  # Matches empty strings
 length_pattern = r'^[^ ]{1,5}$'  # Matches 1 to 5 characters long strings
 num_pattern = r'\d'  # Matches strings that contain numbers
 anon_pattern = r'anon|anonymous|unnamed|unknown|unidentified|name withheld|witheld|nobody|no name|noname|unattributed'
+etal_pattern = r'^[ae]+[t]+(\.)?(\s)?a[li]+(\.)?$'  # Matches strings that contain 'et al.
 
 # Combine organization keywords into one regex pattern
 organization_keys = [
@@ -77,8 +78,9 @@ organization_pattern = '|'.join(organization_keys)
 conditions = [
     (data['first'].str.match(nan_pattern, na=False) & 
      data['middle'].str.match(nan_pattern, na=False) & 
-     data['last'].str.match(nan_pattern, na=False)) | 
+     data['last'].str.match(nan_pattern, na=False)) |
     data['combined'].str.contains(anon_pattern, na=False, flags=re.IGNORECASE),
+    data['combined'].str.match(etal_pattern, na=False, flags=re.IGNORECASE),
     data['combined'].str.contains(organization_pattern, na=False, flags=re.IGNORECASE),
     data['combined'].str.contains(num_pattern, na=False),
     data['combined'].str.match(length_pattern, na=False)
@@ -87,6 +89,7 @@ conditions = [
 # Define the corresponding values for each category
 choices = [
     "Anonymous",
+    "Et al.",
     "Organization",
     "Contains Number",
     "Short Name"
