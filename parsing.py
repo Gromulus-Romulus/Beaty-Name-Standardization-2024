@@ -126,6 +126,9 @@ identified = data[~data['first'].isna() & ~data['last'].isna()]
 # How many distinct tokenized names are there ~ 11,887
 distinct = identified['tokenized'].nunique()
 
+# The opposite of what is in distinct dataframe
+non_distinct = identified[~identified['tokenized'].duplicated(keep=False)]
+
 count_by_lastname = identified.groupby('last').size().reset_index(name='count')
 count_by_firstname = identified.groupby('first').size().reset_index(name='count')
 count_by_full = identified.groupby('tokenized').size().reset_index(name='count')

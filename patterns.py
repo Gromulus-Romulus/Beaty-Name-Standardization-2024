@@ -31,7 +31,7 @@ def match_thomas_taylor(s: str) -> bool:
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_john_eastham(s: str) -> bool:
-    pattern = r'\b(j|jo[ghn]?n)\s*[qwe]*\s*(e[a]?st[he]?a[mn])\b'
+    pattern = r'\b(f|j|jo[ghn]?n)\s*[qwe]*\s*(e[a]?st[he]?a[mn])\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_katherine_beamish(s: str) -> bool:
