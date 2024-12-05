@@ -175,7 +175,6 @@ def classify_name(row):
 # Apply the classify_name function to each row
 data['standard'] = data.apply(classify_name, axis=1)
 
-# - - - - - - - - - - - - 
 # Test Cases
 frank_lomer = data >> sift(X['standard'] == 'Frank Lomer')
 vladimir_krajina = data >> sift(X['standard'] == 'Vladimir J. Krajina')
@@ -267,60 +266,3 @@ to_standardize = to_standardize.rename(columns={
 })
 
 to_standardize.to_excel("to_standardize.xlsx", index=False)
-
-# - - - - - - - - - - - -
-# Next approach is to count remaining uncategorized names by alphabetical order
-# This will help in identifying patterns and exceptions
-
-# Ignore first, middle, last fields for now
-# data_uncategorized = data >> \
-#     sift(X['standard'].isna()) >> \
-#     dplyr.select(X.GUID, X.combined, X.combined_tokens, X.standard)
-#     
-# # Assuming `tokenize` is a function that splits the name string into tokens
-# # Extract last name with a check for empty tokens
-# data_uncategorized['lastname'] = [
-#     tokenize(name)[-1] if tokenize(name) else None for name in data_uncategorized['combined_tokens']
-# ]
-# 
-# data_uncategorized['firstname'] = [
-#     tokenize(name)[0] if tokenize(name) else None for name in data_uncategorized['combined_tokens']
-# ]
-
-# import matplotlib.pyplot as plt
-# 
-# # Group by the last name and count occurrences
-# count_by_lastname = data_uncategorized.groupby('lastname').size().reset_index(name='count')
-# 
-# # Create a new column to group names with occurrences of 1 or 2 under "Other"
-# count_by_lastname['lastname_grouped'] = count_by_lastname['lastname'].where(count_by_lastname['count'] > 5, 'Other')
-# 
-# # Re-aggregate the counts based on the new grouped names
-# count_by_lastname_grouped = count_by_lastname.groupby('lastname_grouped')['count'].sum().reset_index()
-# 
-# # Plot a pie chart
-# import matplotlib.pyplot as plt
-# 
-# plt.figure(figsize=(8, 8))
-# plt.pie(count_by_lastname_grouped['count'], labels=count_by_lastname_grouped['lastname_grouped'], autopct='%1.1f%%', startangle=140)
-# plt.title("Distribution of Entries by Last Name (Grouped)")
-# plt.show()
-# 
-# # Group by the first name and count occurrences
-# count_by_firstname = data_uncategorized.groupby('firstname').size().reset_index(name='count')
-# 
-# # Create a new column to group names with occurrences of 1 or 2 under "Other"
-# count_by_firstname['firstname_grouped'] = count_by_firstname['firstname'].where(count_by_firstname['count'] > 20, 'Other')
-# 
-# # Re-aggregate the counts based on the new grouped names
-# count_by_firstname_grouped = count_by_firstname.groupby('firstname_grouped')['count'].sum().reset_index()
-# 
-# # Count by first name
-# import matplotlib.pyplot as plt
-# 
-# plt.figure(figsize=(8, 8))
-# plt.pie(count_by_firstname_grouped['count'], labels=count_by_firstname_grouped['firstname_grouped'], autopct='%1.1f%%', startangle=140)
-# plt.title("Distribution of Entries by First Name (Grouped)")
-# plt.show()
-
-

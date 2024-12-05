@@ -132,9 +132,3 @@ duplicates = duplicates >> dplyr.arrange(X['tokenized'])
 
 # Sort, remove tokenized column and save to excel
 duplicates.to_excel('./merge_duplicates.xlsx', index=False)
-
-# // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-#count_by_lastname = identified.groupby('last').size().reset_index(name='count')
-#count_by_firstname = identified.groupby('first').size().reset_index(name='count')
-#count_by_full = identified.groupby('tokenized').size().reset_index(name='count')
-# // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
