@@ -124,11 +124,21 @@ leftover = data[data['first'].isna() | data['last'].isna()]
 identified = data[~data['first'].isna() & ~data['last'].isna()]
 
 # How many distinct tokenized names are there ~ 11,887
+unique_rows = identified.drop_duplicates(subset='tokenized', keep=False)
 distinct = identified['tokenized'].nunique()
 
-# The opposite of what is in distinct dataframe
-non_distinct = identified[~identified['tokenized'].duplicated(keep=False)]
+# Sort the duplicates by the 'tokenized' column
+duplicates = duplicates >> dplyr.arrange(X['tokenized'])
 
-count_by_lastname = identified.groupby('last').size().reset_index(name='count')
-count_by_firstname = identified.groupby('first').size().reset_index(name='count')
-count_by_full = identified.groupby('tokenized').size().reset_index(name='count')
+# Remove the 'tokenized' column
+duplicates = duplicates >> dplyr.select(~X['tokenized'])
+
+
+# Sort, remove tokenized column and save to excel
+duplicates.sort().to_excel('./merge_duplicates.xlsx', index=False)
+
+# // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+#count_by_lastname = identified.groupby('last').size().reset_index(name='count')
+#count_by_firstname = identified.groupby('first').size().reset_index(name='count')
+#count_by_full = identified.groupby('tokenized').size().reset_index(name='count')
+# // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
