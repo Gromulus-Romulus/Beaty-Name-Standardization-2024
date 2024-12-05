@@ -108,7 +108,7 @@ data = data >> mutate(
 # This will help us match names more accurately
 data['combined_tokens'] = data['combined'].apply(lambda x: ' '.join(tokenize(x)))
 
-from classifier import *
+from patterns import *
 
 # Find all instances of all standard names
 # Apply the function to the combined column and create a boolean mask
