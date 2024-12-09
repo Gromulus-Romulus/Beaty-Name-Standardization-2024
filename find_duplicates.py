@@ -127,8 +127,12 @@ identified = data[~data['first'].isna() & ~data['last'].isna()]
 unique_rows = identified.drop_duplicates(subset='tokenized', keep=False)
 distinct = identified['tokenized'].nunique()
 
-# Sort the duplicates by the 'tokenized' column
-duplicates = duplicates >> dplyr.arrange(X['tokenized'])
+# Identify duplicate rows based on the 'tokenized' column
+duplicates = identified[identified.duplicated(subset='tokenized', keep=False)]
 
-# Sort, remove tokenized column and save to excel
+# Sort the duplicates by the 'tokenized' column
+duplicates = duplicates.sort_values(by='tokenized')
+
+# Save to Excel
 duplicates.to_excel('./merge_duplicates.xlsx', index=False)
+
