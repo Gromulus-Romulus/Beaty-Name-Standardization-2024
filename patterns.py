@@ -27,7 +27,7 @@ def match_vladimir_krajina(s: str) -> bool:
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_thomas_taylor(s: str) -> bool:
-    pattern = r'\b(t|tmc|t(h)?om[ai]s)\s*[mc]*\s*[mc]+\s*(ta[iy]?l[oei]?r)\b'
+    pattern = r'\b(t|tmc|t(h)?om[ai]s)\s*[mct]*\s*[mct]+\s*(ta[iy]?l[oei]?r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_john_eastham(s: str) -> bool:
@@ -71,7 +71,7 @@ def match_jim_pojar(s: str) -> bool:
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_roy_taylor(s: str) -> bool:
-    pattern = r'\b(r|roy)\s*(l)?\s*(tayl[oe]r)\b'
+    pattern = r'^\b(r|roy)\s*(l)?\s*(tayl[oe]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_bruce_bennett(s: str) -> bool:
@@ -159,11 +159,11 @@ def match_quentin_cronk(s: str) -> bool:
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
   
 def match_william_randolph_taylor(s: str) -> bool:
-    pattern = r'\b(wm(r)?|wi[l]+([eia]+m)?)\s*(r|randol[phf]+)?\s*(tayl[oe]r)\b'
+    pattern = r'\b(w|wm(r)?|wi[l]+([eia]+m)?)\s*(r|randol[phf]+)?\s*(tayl[oe]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_fj_r_taylor(s: str) -> bool:
-    pattern = r'\b(f[jr]+)\s*[jr]*\s*[jr]*\s*(tayl[oe]r)\b'
+    pattern = r'\b(f|f[jr]+)\s*([jr]*)\s*([jr]*)\s*(tayl[oe]r)\b'
     return bool(re.search(pattern, s.strip(), re.IGNORECASE))
 
 def match_sandra_c_lindstrom(s: str) -> bool:
